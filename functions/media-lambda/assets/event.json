@@ -1,0 +1,14 @@
+{
+    "Records": [
+        {
+            "s3": {
+                "bucket": {
+                    "name": "some-bucket-here"
+                },
+                "object": {
+                    "key": "bbb_short.mp4/ads/black/ed440850-70f8-4539-865d-27c1b38b8537.vmap.xml"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>{PAGE_TITLE}</title>
+  
+  <!--
+
+  Uses the latest versions of video.js and videojs-http-streaming.
+
+  To use specific versions, please change the URLs to the form:
+
+  <link href="https://unpkg.com/video.js@6.7.1/dist/video-js.css" rel="stylesheet">
+  <script src="https://unpkg.com/video.js@6.7.1/dist/video.js"></script>
+  <script src="https://unpkg.com/@videojs/http-streaming@0.9.0/dist/videojs-http-streaming.js"></script>
+
+  -->
+
+  <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">
+</head>
+<body>
+  <h1>{PAGE_TITLE}</h1>
+
+  <video-js id="my_video_1" class="vjs-default-skin" controls preload="auto" width="960" height="400">
+    <source src="{STREAM_URL}" type="application/x-mpegURL">
+  </video-js>
+  
+  <ul id="adsUl" data-ts="{ADS_TS}">
+    <!--<li class="ads" data-ts="300">First Ad Break</li>
+    <li class="ads" data-ts="470">Second Ad Break</li>
+    <li class="ads" data-ts="630">Third Ad Break</li>-->
+  </ul>
+  
+  <script src="https://unpkg.com/video.js/dist/video.js"></script>
+  <script src="https://unpkg.com/@videojs/http-streaming/dist/videojs-http-streaming.js"></script>
+  
+  <script>
+    /*global videojs*/
+    const player = videojs('my_video_1');
+    const adsUl = document.querySelector('#adsUl');
+    const adsTs = adsUl.getAttribute('data-ts').split(',');
+    
+    const liCallback = player => ({target}) => {
+      const ts = parseInt(target.getAttribute('data-ts'), 10);
+      player.currentTime(ts);
+      player.play();
+    };
+    
+    const createAdLi = (ts, text) => {
+      const li = document.createElement('li');
+      li.setAttribute('data-ts', ts)
+      li.appendChild(document.createTextNode(text));
+      li.addEventListener("click", liCallback(player));
+      return li;
+    };
+      
+    
+    for(const adTs of adsTs){
+      const li = createAdLi(adTs, `ad-break at ${adTs} sec`);
+      adsUl.appendChild(li);
+    }
+
+  </script>
+  
+</body>
+</html>

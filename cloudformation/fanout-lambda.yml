@@ -1,0 +1,207 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation template to create the Fan-out Lambda for the Automatic Ads Solution
+Parameters:
+  SolutionName:
+    Type: String
+    Default: automads-solution
+  EnvironmentSuffix:
+    Type: String
+    Default: dev
+  MediaLambdaAdProfilesBucket:
+    Type: 'String'
+  DynamoDBMetadataTable:
+    Type: 'String'
+  DynamoDBMetadataTableArn:
+    Type: 'String'
+  FargateTasksBlackFramesTaskArn:
+    Type: 'String'
+  MediaConvertEndpoint:
+    Type: 'String'
+  VPCSubnets:
+    Type: 'String'
+  FargateTasksClusterName:
+    Type: 'String'
+  FargateTasksFargateTaskRoleArn:
+    Type: 'String'
+  FargateTasksFargateExecutionRoleArn:
+    Type: 'String'
+
+Resources:
+  InputBucket:
+    DependsOn: BucketPermission
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${EnvironmentSuffix}-${SolutionName}-input-bucket"
+      NotificationConfiguration:
+        LambdaConfigurations:
+          -
+            Event: 's3:ObjectCreated:*'
+            Function: !GetAtt Function.Arn
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: Suffix
+                    Value: '.mp4'
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+        -
+          Key: 'Environment'
+          Value: !Ref EnvironmentSuffix
+
+  BucketPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt Function.Arn
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref "AWS::AccountId"
+      SourceArn: !Sub "arn:aws:s3:::${EnvironmentSuffix}-${SolutionName}-input-bucket"
+
+  OutputBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${EnvironmentSuffix}-${SolutionName}-output-bucket"
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+        -
+          Key: 'Environment'
+          Value: !Ref EnvironmentSuffix
+
+  FanOutLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+        -
+          Key: 'Environment'
+          Value: !Ref EnvironmentSuffix
+      Policies:
+        - PolicyName: access-metadata-table
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'dynamodb:*'
+                Resource: !Ref DynamoDBMetadataTableArn
+        - PolicyName: access-mediaconvert
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'mediaconvert:*'
+                Resource: '*'
+        - PolicyName: run-ecs-tasks
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'ecs:RunTask'
+                Resource: '*'
+        - PolicyName: pass-down-iam-role-to-mediaconvert
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'iam:PassRole'
+                Resource: !GetAtt MediaConvertJobRole.Arn
+        - PolicyName: pass-down-iam-roles-to-task
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'iam:PassRole'
+                Resource: !Ref FargateTasksFargateTaskRoleArn
+        - PolicyName: pass-down-iam-roles-to-fargate
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'iam:PassRole'
+                Resource: !Ref FargateTasksFargateExecutionRoleArn
+
+  MediaConvertJobRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "mediaconvert.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+        -
+          Key: 'Environment'
+          Value: !Ref EnvironmentSuffix
+
+  MediaConvertQueue:
+    Type: AWS::MediaConvert::Queue
+    Properties:
+      Description: !Sub 'Media Convert Queue - ${SolutionName} (${EnvironmentSuffix})'
+      Name: !Sub ${EnvironmentSuffix}-${SolutionName}-queue
+      Status: PAUSED
+
+  Function:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: '../functions/fanout-lambda/dist/fanout-lambda.zip'
+      Description: 'Lambda Function that triggers MediaConvert job and various analysis tasks'
+      Environment:
+        Variables:
+          OUTPUT_BUCKET: !Ref OutputBucket
+          METADATA_TABLE: !Ref DynamoDBMetadataTable
+          ECS_FARGATE_CLUSTER: !Ref FargateTasksClusterName
+          BLACK_FRAMES_TASK: !Ref FargateTasksBlackFramesTaskArn
+          SUBNETS: !Ref VPCSubnets
+          MC_JOB_ROLE_ARN: !GetAtt MediaConvertJobRole.Arn
+          MC_CUSTOMER_ENDPOINT: !Ref MediaConvertEndpoint
+          MC_QUEUE_JOB_ARN: !GetAtt MediaConvertQueue.Arn
+          ADS_OUTPUT_BUCKET: !Ref MediaLambdaAdProfilesBucket
+      FunctionName: !Sub ${EnvironmentSuffix}-${SolutionName}-fanout-lambda
+      Handler: fanout-lambda.lambda_handler
+      MemorySize: 512
+      ReservedConcurrentExecutions: 1
+      Role: !GetAtt FanOutLambdaExecutionRole.Arn
+      Runtime: python3.6
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+      Timeout: 30
+
+Outputs:
+  FanOutLambdaExecutionRoleArn:
+    Value: !GetAtt FanOutLambdaExecutionRole.Arn
+  InputBucket:
+    Value: !Ref InputBucket
+    Description: Bucket for Input Media Source storage
+  OutputBucket:
+    Value: !Ref OutputBucket
+    Description: Bucket for Output Media (Playlists) storage

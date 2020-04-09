@@ -1,0 +1,14 @@
+{
+    "Records": [
+        {
+            "s3": {
+                "bucket": {
+                    "name": "gbatt-drive"
+                },
+                "object": {
+                    "key": "bbb.mp4"
+                }
+            }
+        }
+    ]
+}

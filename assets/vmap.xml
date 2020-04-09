@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vmap:VMAP xmlns:vmap="http://www.iab.net/videosuite/vmap" version="1.0">
+    <vmap:AdBreak timeOffset="00:05:04.125" breakType="linear" breakId="NDY3Mjc0MTAyODIyODU0MDQzMA==">
+    <vmap:AdSource id="ad-source-NDY3Mjc0MTAyODIyODU0MDQzMA==" allowMultipleAds="false" followRedirects="true">
+        <vmap:AdTagURI templateType="vast3"><![CDATA[https://pubads.g.doubleclick.net/gampad/ads?slotname=/124319096/external/ad_rule_samples&sz=640x480&ciu_szs=300x250&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&url=&unviewed_position_start=1&output=xml_vast3&impl=s&env=vp&gdfp_req=1&ad_rule=0&cue=15000&vad_type=linear&vpos=midroll&pod=2&mridx=1&rmridx=1&ppos=1&lip=true&min_ad_duration=0&max_ad_duration=30000&vrid=6256&video_doc_id=short_onecue&cmsid=496&kfa=0&tfcd=0]]></vmap:AdTagURI>
+    </vmap:AdSource>
+</vmap:AdBreak><vmap:AdBreak timeOffset="00:07:45.6915" breakType="linear" breakId="NDk1MTIxNDcyMzgzODQ4NTg4MA==">
+    <vmap:AdSource id="ad-source-NDk1MTIxNDcyMzgzODQ4NTg4MA==" allowMultipleAds="false" followRedirects="true">
+        <vmap:AdTagURI templateType="vast3"><![CDATA[https://pubads.g.doubleclick.net/gampad/ads?slotname=/124319096/external/ad_rule_samples&sz=640x480&ciu_szs=300x250&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&url=&unviewed_position_start=1&output=xml_vast3&impl=s&env=vp&gdfp_req=1&ad_rule=0&cue=15000&vad_type=linear&vpos=midroll&pod=2&mridx=1&rmridx=1&ppos=1&lip=true&min_ad_duration=0&max_ad_duration=30000&vrid=6256&video_doc_id=short_onecue&cmsid=496&kfa=0&tfcd=0]]></vmap:AdTagURI>
+    </vmap:AdSource>
+</vmap:AdBreak><vmap:AdBreak timeOffset="00:10:18.2" breakType="linear" breakId="Nzk3NTU2MzIzNTg4OTgwMjYzNA==">
+    <vmap:AdSource id="ad-source-Nzk3NTU2MzIzNTg4OTgwMjYzNA==" allowMultipleAds="false" followRedirects="true">
+        <vmap:AdTagURI templateType="vast3"><![CDATA[https://pubads.g.doubleclick.net/gampad/ads?slotname=/124319096/external/ad_rule_samples&sz=640x480&ciu_szs=300x250&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&url=&unviewed_position_start=1&output=xml_vast3&impl=s&env=vp&gdfp_req=1&ad_rule=0&cue=15000&vad_type=linear&vpos=midroll&pod=2&mridx=1&rmridx=1&ppos=1&lip=true&min_ad_duration=0&max_ad_duration=30000&vrid=6256&video_doc_id=short_onecue&cmsid=496&kfa=0&tfcd=0]]></vmap:AdTagURI>
+    </vmap:AdSource>
+</vmap:AdBreak>
+</vmap:VMAP>

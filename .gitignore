@@ -1,0 +1,14 @@
+.vscode/
+bin/
+include/
+lib/
+*/__pycache__/
+**/__pycache__/
+*.auto.*
+.DS_STORE
+*.ignore.*
+*dist/
+*.pkg.yml
+.env
+00-research/
+**/node_modules/

@@ -1,0 +1,111 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation template to create the Automatic Ads Solution
+Parameters:
+  EnvironmentSuffix:
+    Type: String
+    Default: dev
+  SolutionName:
+    Type: String
+    Default: automads-solution
+  MediaConvertEndpoint:
+    Type: String
+    Default: 'https://tgzfwmguc.mediaconvert.eu-west-1.amazonaws.com'
+
+Resources:
+
+  DynamoDB:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        SolutionName: !Ref SolutionName
+        EnvironmentSuffix: !Ref EnvironmentSuffix
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+      TemplateURL: ./dynamodb.yml
+      TimeoutInMinutes: 10
+
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        CreateElasticLoadBalancer: false
+        EcsClusterName: !Sub ${EnvironmentSuffix}-${SolutionName}
+        EcsPort: 80
+        IsFargate: true
+        SourceCidr: 0.0.0.0/0
+        SubnetCidrBlock1: 10.0.0.0/24
+        SubnetCidrBlock2: 10.0.1.0/24
+        VpcAvailabilityZones: eu-west-1a,eu-west-1b,eu-west-1c
+        VpcCidrBlock: 10.0.0.0/16
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+      TemplateURL: ./vpc.yml
+      TimeoutInMinutes: 45
+
+  FargateTasks:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        SolutionName: !Ref SolutionName
+        EnvironmentSuffix: !Ref EnvironmentSuffix
+        DynamoDBMetadataTable: !GetAtt DynamoDB.Outputs.MetadataTable
+        DynamoDBMetadataTableArn: !GetAtt DynamoDB.Outputs.MetadataTableArn
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+      TemplateURL: ./tasks.yml
+      TimeoutInMinutes: 10
+
+  MediaLambda:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        SolutionName: !Ref SolutionName
+        EnvironmentSuffix: !Ref EnvironmentSuffix
+        DynamoDBMetadataTable: !GetAtt DynamoDB.Outputs.MetadataTable
+        DynamoDBMetadataTableArn: !GetAtt DynamoDB.Outputs.MetadataTableArn
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+      TemplateURL: ./media-lambda.pkg.yml
+      TimeoutInMinutes: 10
+
+  FanOutLambda:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        SolutionName: !Ref SolutionName
+        EnvironmentSuffix: !Ref EnvironmentSuffix
+        MediaLambdaAdProfilesBucket: !GetAtt MediaLambda.Outputs.AdProfilesBucket
+        DynamoDBMetadataTable: !GetAtt DynamoDB.Outputs.MetadataTable
+        DynamoDBMetadataTableArn: !GetAtt DynamoDB.Outputs.MetadataTableArn
+        FargateTasksBlackFramesTaskArn: !GetAtt FargateTasks.Outputs.BlackFramesTaskArn
+        MediaConvertEndpoint: !Ref MediaConvertEndpoint
+        VPCSubnets: !GetAtt VPC.Outputs.Subnets
+        FargateTasksClusterName: !GetAtt FargateTasks.Outputs.ClusterName
+        FargateTasksFargateTaskRoleArn: !GetAtt FargateTasks.Outputs.FargateTaskRoleArn
+        FargateTasksFargateExecutionRoleArn: !GetAtt FargateTasks.Outputs.FargateExecutionRoleArn
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+      TemplateURL: ./fanout-lambda.pkg.yml
+      TimeoutInMinutes: 20
+
+Outputs:
+  FargateTasksBlackFramesDockerRepository:
+    Value: !GetAtt FargateTasks.Outputs.BlackFramesDockerRepository
+  FargateTasksApplicationName:
+    Value: !GetAtt FargateTasks.Outputs.ApplicationName
+  StackEnvironment:
+    Value: !Ref EnvironmentSuffix
+  SolutionName:
+    Value: !Ref SolutionName
+  MediaConvertEndpoint:
+    Value: !Ref MediaConvertEndpoint

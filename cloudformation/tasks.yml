@@ -1,0 +1,168 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'Ads/Tasks'
+
+Parameters:
+
+  EnvironmentSuffix:
+    Type: 'String'
+    Default: dev
+  SolutionName:
+    Type: 'String'
+  DynamoDBMetadataTable:
+    Type: 'String'
+  DynamoDBMetadataTableArn:
+    Type: 'String'
+
+Resources:
+
+  FargateExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "ecs-tasks.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+        -
+          Key: 'Environment'
+          Value: !Ref EnvironmentSuffix
+
+  FargateTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "ecs-tasks.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: access-input-bucket
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 's3:*'
+                Resource: !Sub arn:aws:s3:::${EnvironmentSuffix}-${SolutionName}-*
+        - PolicyName: access-ads-bucket
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 's3:*'
+                Resource: !Sub arn:aws:s3:::${EnvironmentSuffix}-${SolutionName}-*
+        - PolicyName: access-metadata-table
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'dynamodb:*'
+                Resource: !Ref DynamoDBMetadataTableArn
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+        -
+          Key: 'Environment'
+          Value: !Ref EnvironmentSuffix
+
+  Cluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: !Sub ${EnvironmentSuffix}-${SolutionName}
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+        -
+          Key: 'Environment'
+          Value: !Ref EnvironmentSuffix
+
+  ECRBlack:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub ${EnvironmentSuffix}-${SolutionName}-black
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+        -
+          Key: 'Environment'
+          Value: !Ref EnvironmentSuffix
+
+  BlackFramesTaskDefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    Properties:
+      Family: !Sub '${EnvironmentSuffix}-${SolutionName}-black-frames'
+      Cpu: 4096
+      Memory: 8192
+      NetworkMode: 'awsvpc'
+      RequiresCompatibilities:
+        - 'FARGATE'
+      ExecutionRoleArn: !Ref FargateExecutionRole
+      TaskRoleArn: !Ref FargateTaskRole
+      ContainerDefinitions:
+        - Name: 'black-frames-detection-container'
+          Cpu: 4096
+          Memory: 8192
+          Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRBlack}:latest
+          Environment:
+            - Name: 'FFMPEG_BLACK_DURATION'
+              Value: 0.5
+            - Name: 'FFMPEG_BLACK_THRESHOLD'
+              Value: 0.0
+            - Name: 'METADATA_TABLE'
+              Value: !Ref DynamoDBMetadataTable
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group: !Join ['-', ['black-frames', !Ref 'EnvironmentSuffix']]
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: !Sub '/automads/${EnvironmentSuffix}/black/'
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+        -
+          Key: 'Environment'
+          Value: !Ref EnvironmentSuffix
+
+  LogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      LogGroupName: !Join ['-', ['black-frames', !Ref 'EnvironmentSuffix']]
+
+Outputs:
+  BlackFramesTaskArn:
+    Description: Black Frames Task ARN
+    Value: !Ref BlackFramesTaskDefinition
+  BlackFramesDockerRepository:
+    Description: Black Frames Task ECR Docker Repository
+    Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRBlack}:latest
+  ClusterName:
+    Value: !Ref Cluster
+  FargateExecutionRoleArn:
+    Value: !GetAtt FargateExecutionRole.Arn
+  FargateTaskRoleArn:
+    Value: !GetAtt FargateTaskRole.Arn
+  ApplicationName:
+    Value: !Ref ECRBlack

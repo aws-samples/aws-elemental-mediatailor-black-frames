@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation template to create the DynamoDB Estate for the Automatic Ads Solution
+Parameters:
+  EnvironmentSuffix:
+    Type: String
+    Default: dev
+  SolutionName:
+    Type: String
+    Default: automads-solution
+
+Resources:
+  MetadataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "MediaId"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "MediaId"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: !Sub "${EnvironmentSuffix}-${SolutionName}-metadata-table"
+      Tags:
+        -
+          Key: 'Stack'
+          Value: !Sub ${AWS::StackName}
+
+Outputs:
+  MetadataTable:
+    Value: !Ref MetadataTable
+  MetadataTableArn:
+    Value: !GetAtt 'MetadataTable.Arn'
