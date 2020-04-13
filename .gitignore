@@ -9,6 +9,6 @@ lib/
 *.ignore.*
 *dist/
 *.pkg.yml
-.env
+*.env
 00-research/
 **/node_modules/

@@ -3,6 +3,8 @@
 # Import configuration
 . ./.env
 
+MEDIA_CONVERT_ENDPOINT=$(aws mediaconvert describe-endpoints --query Endpoints[0].Url | xargs)
+
 # Build the fanout lambda
 cd functions/fanout-lambda
 make build
@@ -31,6 +33,8 @@ aws cloudformation package \
 aws cloudformation deploy \
     --template-file ./main.pkg.yml \
     --stack-name $STACK_NAME \
+    --parameter-overrides \
+    MediaConvertEndpoint=$MEDIA_CONVERT_ENDPOINT \
     --capabilities CAPABILITY_IAM
 
 cd ..
@@ -72,5 +76,12 @@ HEREDOC
 mv deploy.auto.env tasks/black-frames/deploy.auto.env
 
 cd tasks/black-frames
-make dpl="deploy.auto.env" release
+make dpl="deploy.auto.env" build-nc
+echo "The container built at the previous step makes use of FFmpeg with the following License"
+make dpl="deploy.auto.env" test-ffmpeg-license
+echo "By deploying and using this container, you agree to the terms and conditions stated in the license agreement above."
+echo "More information about FFmpeg in README.md"
+read -p "Do you wish to continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+echo "Ok, deploying to ECR"
+make dpl="deploy.auto.env" publish
 cd ../..

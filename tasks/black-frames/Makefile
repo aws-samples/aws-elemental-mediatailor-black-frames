@@ -48,6 +48,19 @@ run-c9-i: ## Run container in Cloud9 IDE interactively wirh configs in `config.e
 	docker run -i -t --rm --env-file=./config.env \
 	-v "$(HOME)"/.aws:/root/.aws \
 	--name="$(APP_NAME)" --entrypoint /bin/bash $(APP_NAME)
+	
+run-c9-i-mount: ## Run container in Cloud9 IDE interactively wirh configs in `config.env`
+	docker run -i -t --rm --env-file=./config.env \
+	-v "$(HOME)"/.aws:/root/.aws \
+	-v /tmp:/tmp/workdir/assets \
+	--name="$(APP_NAME)" --entrypoint /bin/bash $(APP_NAME)
+	
+test-ffmpeg-license:
+	@cp ../../assets/bbb_short.mp4 /tmp/bbb_short.mp4
+	@docker run -i -t --rm --env-file=./config.env \
+	-v "$(HOME)"/.aws:/root/.aws \
+	-v /tmp:/tmp/workdir/assets \
+	--name="$(APP_NAME)" $(APP_NAME) -L
 
 up: build run-c9 ## Build and run container as configured in `config.env` (Alias to run)
 

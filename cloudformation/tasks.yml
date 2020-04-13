@@ -137,7 +137,7 @@ Resources:
             Options:
               awslogs-group: !Join ['-', ['black-frames', !Ref 'EnvironmentSuffix']]
               awslogs-region: !Ref 'AWS::Region'
-              awslogs-stream-prefix: !Sub '/automads/${EnvironmentSuffix}/black/'
+              awslogs-stream-prefix: !Sub '/abc/${EnvironmentSuffix}/black/'
       Tags:
         -
           Key: 'Stack'

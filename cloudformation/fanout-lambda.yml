@@ -3,9 +3,8 @@ Description: AWS CloudFormation template to create the Fan-out Lambda for the Au
 Parameters:
   SolutionName:
     Type: String
-    Default: automads-solution
   EnvironmentSuffix:
-    Type: String
+    Type: 'String'
     Default: dev
   MediaLambdaAdProfilesBucket:
     Type: 'String'
@@ -107,14 +106,14 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: 'mediaconvert:*'
-                Resource: '*'
+                Resource: !Sub "arn:*:mediaconvert:${AWS::Region}:${AWS::AccountId}:queues/${EnvironmentSuffix}-${SolutionName}-queue"
         - PolicyName: run-ecs-tasks
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action: 'ecs:RunTask'
-                Resource: '*'
+                Resource: !Ref FargateTasksBlackFramesTaskArn
         - PolicyName: pass-down-iam-role-to-mediaconvert
           PolicyDocument:
             Version: 2012-10-17

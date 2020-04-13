@@ -18,18 +18,18 @@ This task makes use of FFMPEG to detect black segments of a media file hosted on
 
 Once fired up, the task will
 
-1. gathers input from environment
-2. downloads the media asset from S3 to the local filesystem
-3. executes `ffmpeg` to find long segments of black frames via `blackdetect`
-4. builds the VMAP file from the output of `ffmpeg`
-5. uploads the VMAP file to S3, sets its ACL to public
-6. updates the metadata table
+1. gather input from environment
+2. download the media asset from S3 to the local filesystem
+3. execute `ffmpeg` to find long segments of black frames via `blackdetect`
+4. build the VMAP file from the output of `ffmpeg`
+5. upload the VMAP file to S3, set its ACL to public
+6. update the metadata table
 
 ## Output
 
 This task causes the following side-effects
-1. uploads a VMAP file to `OUTPUT_MEDIA_BUCKET`
-2. updates the `METADATA_TABLE`
+1. upload of a VMAP file to `OUTPUT_MEDIA_BUCKET`
+2. update of the `METADATA_TABLE`
 
 ## Build
 

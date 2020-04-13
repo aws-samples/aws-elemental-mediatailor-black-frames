@@ -1,15 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: AWS CloudFormation template to create the Automatic Ads Solution
+Description: AWS CloudFormation template to create the Ad Break Creation Solution
 Parameters:
   EnvironmentSuffix:
     Type: String
     Default: dev
   SolutionName:
     Type: String
-    Default: automads-solution
+    Default: abc-solution
   MediaConvertEndpoint:
     Type: String
-    Default: 'https://tgzfwmguc.mediaconvert.eu-west-1.amazonaws.com'
 
 Resources:
 

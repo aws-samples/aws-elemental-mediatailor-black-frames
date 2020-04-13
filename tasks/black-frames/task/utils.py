@@ -4,6 +4,7 @@ from pprint import pformat
 from time import gmtime, strftime
 
 
+# parses the output of ffmpeg into a dictionary
 def ffmpeg_black_frames_to_json(lines):
     lines = [x.split("] ")[1].rstrip() for x in lines if "blackdetect" in x]
     lines = [x.split(" ") for x in lines]
@@ -13,6 +14,7 @@ def ffmpeg_black_frames_to_json(lines):
     return lines
 
 
+# parses seconds expressed as floats into a suitable format for a VMAP file
 def ffmpeg_time_from_seconds(seconds):
     try:
         ms = str(seconds).split(".")[1]
@@ -21,6 +23,7 @@ def ffmpeg_time_from_seconds(seconds):
     return strftime("%H:%M:%S", gmtime(seconds)) + "." + str(ms)
 
 
+# additional properties to each element
 def hydrate_item(item):
     start = float(item["black_start"])
     end = float(item["black_end"])
@@ -32,6 +35,7 @@ def hydrate_item(item):
     return item
 
 
+# generates adbreak tag for each item
 def make_adbreak_tag(vars):
     return """<vmap:AdBreak timeOffset="{timeOffset}" breakType="linear" breakId="{breakId}">
     <vmap:AdSource id="ad-source-{breakId}" allowMultipleAds="false" followRedirects="true">
@@ -42,6 +46,7 @@ def make_adbreak_tag(vars):
     )
 
 
+# generates a VMAP file
 def make_ad_vmap(ads_list):
     begin = """<?xml version="1.0" encoding="UTF-8"?>
 <vmap:VMAP xmlns:vmap="http://www.iab.net/videosuite/vmap" version="1.0">
@@ -53,6 +58,7 @@ def make_ad_vmap(ads_list):
     return begin + ads_tags + end
 
 
+# packages all together
 def build_manifest(ffmpeg_black_frames):
     json_body = ffmpeg_black_frames_to_json(ffmpeg_black_frames)
     prepared_json = list(map(hydrate_item, json_body))
