@@ -74,6 +74,13 @@ with open('deploy.auto.env', 'w') as fp:
 HEREDOC
 
 mv deploy.auto.env tasks/black-frames/deploy.auto.env
+source tasks/black-frames/deploy.auto.env
+
+# activating ECR scan on push
+aws ecr put-image-scanning-configuration \
+    --repository-name $DOCKER_REPO \
+    --image-scanning-configuration scanOnPush=true \
+    --region $AWS_CLI_REGION
 
 cd tasks/black-frames
 make dpl="deploy.auto.env" build-nc
