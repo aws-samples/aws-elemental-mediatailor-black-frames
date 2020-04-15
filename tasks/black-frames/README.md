@@ -80,7 +80,7 @@ The container can be released to an ECR repository by providing the following co
 `deploy.env`
 ```
 APP_NAME=<application-name-here>
-DOCKER_REPO=<aws-account-number>.dkr.ecr.<aws-region>.amazonaws.com
+DOCKER_REPO=<aws-account-number>.dkr.ecr.<aws-region>.amazonaws.com # don't use the full url
 DEPLOY_ENVIRONMENT=dev
 AWS_CLI_REGION=<aws-region>
 ```

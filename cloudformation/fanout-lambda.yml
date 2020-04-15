@@ -106,7 +106,9 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: 'mediaconvert:*'
-                Resource: !Sub "arn:*:mediaconvert:${AWS::Region}:${AWS::AccountId}:queues/${EnvironmentSuffix}-${SolutionName}-queue"
+                Resource: 
+                  - !Sub "arn:*:mediaconvert:*:${AWS::AccountId}:queues/${EnvironmentSuffix}-${SolutionName}-queue"
+                  - !Sub "arn:*:mediaconvert:*:${AWS::AccountId}:presets/System-Avc_16x9_720p_29_97fps_6500kbps"
         - PolicyName: run-ecs-tasks
           PolicyDocument:
             Version: 2012-10-17

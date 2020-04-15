@@ -54,13 +54,26 @@ run-c9-i-mount: ## Run container in Cloud9 IDE interactively wirh configs in `co
 	-v "$(HOME)"/.aws:/root/.aws \
 	-v /tmp:/tmp/workdir/assets \
 	--name="$(APP_NAME)" --entrypoint /bin/bash $(APP_NAME)
+
+test-ffmpeg-black-frames:
+	@cp ../../assets/bbb_short.mp4 /tmp/
+	docker run -i -t --rm \
+	-v /tmp:/tmp/workdir/assets \
+	--name="$(APP_NAME)" --entrypoint "ffmpeg" \
+	$(APP_NAME) -i /tmp/workdir/assets/bbb_short.mp4 -vf blackdetect=d=0.1:pix_th=.1 -f rawvideo -y /dev/null
 	
 test-ffmpeg-license:
-	@cp ../../assets/bbb_short.mp4 /tmp/bbb_short.mp4
 	@docker run -i -t --rm --env-file=./config.env \
 	-v "$(HOME)"/.aws:/root/.aws \
 	-v /tmp:/tmp/workdir/assets \
+	--entrypoint "ffmpeg" \
 	--name="$(APP_NAME)" $(APP_NAME) -L
+	
+run-c9-dev: ## Run container in Cloud9 IDE interactively wirh configs in `config.env`
+	docker run -i -t --rm --env-file=./config.env \
+	-v "$(HOME)"/.aws:/root/.aws \
+	-v "$(PWD)"/task:/tmp/workdir/task \
+	--name="$(APP_NAME)" --entrypoint /bin/bash $(APP_NAME)
 
 up: build run-c9 ## Build and run container as configured in `config.env` (Alias to run)
 

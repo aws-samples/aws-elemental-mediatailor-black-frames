@@ -108,3 +108,5 @@ Outputs:
     Value: !Ref SolutionName
   MediaConvertEndpoint:
     Value: !Ref MediaConvertEndpoint
+  DeploymentRegion:
+    Value: !Ref AWS::Region

@@ -55,7 +55,8 @@ out, err = p.communicate()
 
 # 4. builds the VMAP file from the output of FFMPEG
 # using err instead of out because ffmpeg spits output on err instead of std
-manifest = build_manifest(err.split("\n"))
+
+manifest = build_manifest(str(err).split("\\n"))
 print(manifest)
 
 with open(TASK_OUTPUT_NAME, "w") as fp:
