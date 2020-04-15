@@ -62,6 +62,7 @@ RUN \
         --disable-debug \
         --disable-doc \
         --disable-ffplay \
+        --disable-static --enable-shared \
         --prefix="${PREFIX}" \
         --extra-cflags="-I${PREFIX}/include" \
         --extra-ldflags="-L${PREFIX}/lib" && \
