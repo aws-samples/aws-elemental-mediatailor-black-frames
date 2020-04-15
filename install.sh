@@ -57,7 +57,7 @@ ecr_info = get_output('FargateTasksBlackFramesDockerRepository', outputs)
 repo, app = ecr_info['OutputValue'].split("/")
 app, version = app.split(":")
 environment_info = get_output('StackEnvironment', outputs)['OutputValue']
-region = os.environ.get("AWS_DEFAULT_REGION")
+region = get_output('DeploymentRegion', outputs)['OutputValue']
 
 print("ecr repository: ", repo)
 print("application name: ", app)
@@ -78,17 +78,31 @@ source tasks/black-frames/deploy.auto.env
 
 # activating ECR scan on push
 aws ecr put-image-scanning-configuration \
-    --repository-name $DOCKER_REPO \
+    --repository-name $APP_NAME \
     --image-scanning-configuration scanOnPush=true \
     --region $AWS_CLI_REGION
 
 cd tasks/black-frames
+
+stat config.env
+IS_CONFIG=$?
+
+[[ $IS_CONFIG == "1" ]] && touch config.env
+
+echo "building the contianer"
+echo "this will take around 10 mins"
 make dpl="deploy.auto.env" build-nc
+
+echo "testing black frames detection works ok"
+make dpl="deploy.auto.env" test-ffmpeg-black-frames
+
 echo "The container built at the previous step makes use of FFmpeg with the following License"
 make dpl="deploy.auto.env" test-ffmpeg-license
+
 echo "By deploying and using this container, you agree to the terms and conditions stated in the license agreement above."
 echo "More information about FFmpeg in README.md"
 read -p "Do you wish to continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
-echo "Ok, deploying to ECR"
+
+echo "Ok, deploying to ECR $DOCKER_REPO"
 make dpl="deploy.auto.env" publish
 cd ../..

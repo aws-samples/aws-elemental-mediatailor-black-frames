@@ -39,8 +39,9 @@ RUN      buildDeps="autoconf \
                     perl \
                     pkg-config \
                     python \
-                    python3-dev\
-                    python3-pip\
+                    python3-dev \
+                    python3-pip \
+                    python3-setuptools \
                     libssl-dev \
                     yasm \
                     zlib1g-dev" && \
@@ -80,9 +81,6 @@ RUN \
         LD_LIBRARY_PATH=/usr/local/lib ffmpeg -buildconf
 
 ENV         LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64:/usr/lib:/usr/lib64:/lib:/lib64
-
-
-COPY --from=build /usr/local /usr/local/
 
 RUN pip3 install -U pip && python3 -m pip install awscli boto3
 
