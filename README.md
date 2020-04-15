@@ -110,7 +110,7 @@ FFmpeg has been compiled with the following configuration.
 ```
 ffmpeg version 4.2.2 Copyright (c) 2000-2019 the FFmpeg developers
   built with gcc 7 (Ubuntu 7.5.0-3ubuntu1~18.04)
-  configuration: --disable-debug --disable-doc --disable-ffplay --prefix=/opt/ffmpeg --extra-cflags=-I/opt/ffmpeg/include --extra-ldflags=-L/opt/ffmpeg/lib
+configuration: --disable-debug --disable-doc --disable-ffplay --disable-static --enable-shared --prefix=/opt/ffmpeg --extra-cflags=-I/opt/ffmpeg/include --extra-ldflags=-L/opt/ffmpeg/lib
   libavutil      56. 31.100 / 56. 31.100
   libavcodec     58. 54.100 / 58. 54.100
   libavformat    58. 29.100 / 58. 29.100
