@@ -56,26 +56,23 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
       Policies:
-        - PolicyName: access-input-bucket
+        - PolicyName: access-solution-buckets
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action: 's3:*'
-                Resource: !Sub arn:aws:s3:::${EnvironmentSuffix}-${SolutionName}-*
-        - PolicyName: access-ads-bucket
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action: 's3:*'
+                Action:
+                  - "s3:PutObject"
+                  - "s3:GetObjectAcl"
+                  - "s3:GetObject"
+                  - "s3:PutObjectAcl"
                 Resource: !Sub arn:aws:s3:::${EnvironmentSuffix}-${SolutionName}-*
         - PolicyName: access-metadata-table
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action: 'dynamodb:*'
+                Action: 'dynamodb:UpdateItem'
                 Resource: !Ref DynamoDBMetadataTableArn
       Tags:
         -

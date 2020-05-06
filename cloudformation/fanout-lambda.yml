@@ -31,6 +31,10 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${EnvironmentSuffix}-${SolutionName}-input-bucket"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: 'AES256'
       NotificationConfiguration:
         LambdaConfigurations:
           -
@@ -62,6 +66,10 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${EnvironmentSuffix}-${SolutionName}-output-bucket"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: 'AES256'
       Tags:
         -
           Key: 'Stack'

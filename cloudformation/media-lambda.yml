@@ -18,6 +18,10 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${EnvironmentSuffix}-${SolutionName}-ads-bucket"
+        BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: 'AES256'
       NotificationConfiguration:
         LambdaConfigurations:
           -
