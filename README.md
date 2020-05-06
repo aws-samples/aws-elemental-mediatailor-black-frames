@@ -77,7 +77,7 @@ Populate the file with the following
 STACK_NAME=automatic-ads-profiling-dev
 CFN_BUCKET=<insert-cfn-bucket-here>
 AWS_DEFAULT_REGION=eu-west-1
-
+ENVIRONMENT_SUFFIX=<your-environment>
 ```
 In a shell, run 
 ```bash

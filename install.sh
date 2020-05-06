@@ -17,6 +17,22 @@ cd ../..
 
 cd cloudformation
 
+echo "validating cloudformation templates"
+
+aws cloudformation validate-template \
+    --template-body  file://fanout-lambda.yml
+aws cloudformation validate-template \
+    --template-body  file://media-lambda.yml
+aws cloudformation validate-template \
+    --template-body  file://dynamodb.yml
+aws cloudformation validate-template \
+    --template-body  file://main.yml
+aws cloudformation validate-template \
+    --template-body  file://tasks.yml
+aws cloudformation validate-template \
+    --template-body  file://vpc.yml
+    
+
 aws cloudformation package \
     --template-file ./fanout-lambda.yml \
     --s3-bucket $CFN_BUCKET \
@@ -35,6 +51,7 @@ aws cloudformation deploy \
     --stack-name $STACK_NAME \
     --parameter-overrides \
     MediaConvertEndpoint=$MEDIA_CONVERT_ENDPOINT \
+    EnvironmentSuffix=$ENVIRONMENT_SUFFIX \
     --capabilities CAPABILITY_IAM
 
 cd ..
