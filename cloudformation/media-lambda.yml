@@ -39,6 +39,31 @@ Resources:
         -
           Key: 'Environment'
           Value: !Ref EnvironmentSuffix
+
+  AdProfilesBucketPolicy: 
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: 
+        Ref: "AdProfilesBucket"
+      PolicyDocument: 
+        Statement: 
+          - 
+            Action: 
+              - "s3:*"
+            Effect: "Deny"
+            Resource: 
+              Fn::Join: 
+                - ""
+                - 
+                  - "arn:aws:s3:::"
+                  - 
+                    Ref: "AdProfilesBucket"
+                  - "/*"
+            Principal: "*"
+            Condition: 
+              Bool: 
+                aws:SecureTransport: "false"
+
   BucketPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -68,14 +93,16 @@ Resources:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action: 'mediatailor:*'
-                Resource: '*'
+                Action: 'mediatailor:PutPlaybackConfiguration'
+                Resource: 'arn:aws:mediatailor:*:*:playbackConfiguration/*'
         - PolicyName: access-metadata-table
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action: 'dynamodb:*'
+                Action: 
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:UpdateItem'
                 Resource: !Ref DynamoDBMetadataTableArn
   Function:
     Type: AWS::Lambda::Function

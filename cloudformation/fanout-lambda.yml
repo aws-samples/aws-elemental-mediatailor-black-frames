@@ -53,6 +53,31 @@ Resources:
           Key: 'Environment'
           Value: !Ref EnvironmentSuffix
 
+  InputBucketPolicy: 
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: 
+        Ref: "InputBucket"
+      PolicyDocument: 
+        Statement: 
+          - 
+            Action: 
+              - "s3:*"
+            Effect: "Deny"
+            Resource: 
+              Fn::Join: 
+                - ""
+                - 
+                  - "arn:aws:s3:::"
+                  - 
+                    Ref: "InputBucket"
+                  - "/*"
+            Principal: "*"
+            Condition: 
+              Bool: 
+                aws:SecureTransport: "false"
+
+
   BucketPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -77,6 +102,30 @@ Resources:
         -
           Key: 'Environment'
           Value: !Ref EnvironmentSuffix
+
+  OutputBucketPolicy: 
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: 
+        Ref: "OutputBucket"
+      PolicyDocument: 
+        Statement: 
+          - 
+            Action: 
+              - "s3:*"
+            Effect: "Deny"
+            Resource: 
+              Fn::Join: 
+                - ""
+                - 
+                  - "arn:aws:s3:::"
+                  - 
+                    Ref: "OutputBucket"
+                  - "/*"
+            Principal: "*"
+            Condition: 
+              Bool: 
+                aws:SecureTransport: "false"
 
   FanOutLambdaExecutionRole:
     Type: AWS::IAM::Role
@@ -106,14 +155,14 @@ Resources:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action: 'dynamodb:*'
+                Action: 'dynamodb:PutItem'
                 Resource: !Ref DynamoDBMetadataTableArn
         - PolicyName: access-mediaconvert
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action: 'mediaconvert:*'
+                Action: 'mediaconvert:CreateJob'
                 Resource: 
                   - !Sub "arn:*:mediaconvert:*:${AWS::AccountId}:queues/${EnvironmentSuffix}-${SolutionName}-queue"
                   - !Sub "arn:*:mediaconvert:*:${AWS::AccountId}:presets/System-Avc_16x9_720p_29_97fps_6500kbps"
