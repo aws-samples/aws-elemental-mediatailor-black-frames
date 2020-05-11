@@ -1,11 +1,4 @@
-FROM jrottenberg/ffmpeg:4.2-ubuntu
-
-RUN apt-get update -yq && \
-    apt-get install python3-dev python3-pip -yq && \
-    apt-get autoremove -yq && \
-    apt-get clean -yq
-
-RUN pip3 install -U pip && python3 -m pip install awscli boto3
+FROM giusedroid/ffmpeg-lgpl:ubuntu
 
 WORKDIR /tmp/workdir
 

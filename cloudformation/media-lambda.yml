@@ -93,7 +93,9 @@ Resources:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action: 'mediatailor:PutPlaybackConfiguration'
+                Action: 
+                  - 'mediatailor:PutPlaybackConfiguration'
+                  - 'mediatailor:TagResource'
                 Resource: 'arn:aws:mediatailor:*:*:playbackConfiguration/*'
         - PolicyName: access-metadata-table
           PolicyDocument:

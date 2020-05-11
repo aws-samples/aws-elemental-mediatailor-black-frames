@@ -113,12 +113,12 @@ make dpl="deploy.auto.env" build-nc
 echo "testing black frames detection works ok"
 make dpl="deploy.auto.env" test-ffmpeg-black-frames
 
-# echo "The container built at the previous step makes use of FFmpeg with the following License"
-# make dpl="deploy.auto.env" test-ffmpeg-license
+echo "The container built at the previous step makes use of FFmpeg with the following License"
+make dpl="deploy.auto.env" test-ffmpeg-license
 
-# echo "By deploying and using this container, you agree to the terms and conditions stated in the license agreement above."
-# echo "More information about FFmpeg in README.md"
-# read -p "Do you wish to continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+echo "By deploying and using this container, you agree to the terms and conditions stated in the license agreement above."
+echo "More information about FFmpeg in README.md"
+read -p "Do you wish to continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
 echo "deploying to ECR $DOCKER_REPO"
 make dpl="deploy.auto.env" publish

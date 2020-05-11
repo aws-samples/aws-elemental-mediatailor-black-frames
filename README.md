@@ -110,7 +110,7 @@ The solution makes use of FFmpeg to analyze the low-level visual features of the
 **FFmpeg** (https://ffmpeg.org/) is a free and open-source software suite for handling video, audio, 
 and other multimedia files and streams. This solution makes use of FFmpeg to analyze the low-level visual 
 features of the uploaded media files.  
-FFmpeg is distributed under [LGPL license](https://www.gnu.org/licenses/lgpl-3.0.en.html).  
+FFmpeg is distributed under [LGPL license](http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html).  
 For more information about FFmpeg, please see the following link: [https://www.ffmpeg.org/](https://www.ffmpeg.org/).  
 **Your use of the solution will cause you to use FFmpeg.  If you do not want to make use of FFmpeg, do not use the solution**.
 
