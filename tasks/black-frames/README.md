@@ -1,6 +1,6 @@
-# Automads Black Frames Task
+# AWS Elemental MediaTailor - Black Frames - ECS Task
 
-This task makes use of FFMPEG to detect black segments of a media file hosted on S3 and writes info to a DynamoDB table.
+This task makes use of FFmpeg to detect black segments of a media file hosted on S3 and writes info to a DynamoDB table.
 
 ## Input
 
