@@ -119,8 +119,8 @@ For more information about FFmpeg, please see the following link: [https://www.f
 
 ### About the container used in this solution
 This solution builds a contianer that will be hosted on an ECR repository in your AWS account.  
-The container is built on the top of [jrottenberg/ffmpeg](https://hub.docker.com/r/jrottenberg/ffmpeg/).  
-You can inspect the source of said base container [here](https://github.com/jrottenberg/ffmpeg/blob/master/docker-images/4.2/ubuntu1804/Dockerfile).  
+The container is built on the top of [giusedroid/ffmpeg-lgpl-ubuntu](https://hub.docker.com/repository/docker/giusedroid/ffmpeg-lgpl).  
+You can inspect the source of said base container [here](https://github.com/giusedroid/ffmpeg-lgpl-ubuntu/blob/master/Dockerfile).  
 The container is run on ECS Fargate and you can inspect the IAM role under which it operates [here](/cloudformation/tasks.yml).  
 ECR scan on push is activate to inspect the container for known vulnerabilities, 
 for more information, please read [this article](https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html).
