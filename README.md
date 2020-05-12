@@ -1,49 +1,65 @@
 # AWS Elemental MediaTailor - Automatic Ads Profiling - Black Frames
 
+![demo gif](assets/demo.gif)
+
 This repository supports the Media Blog article [Monetizing your Media Content with AWS Elemental MediaTailor and Computer Vision](https://aws.amazon.com/blogs/media/monetizing-your-media-content-with-media-tailor).
   
-The goal of this repository is to deploy a minima pipeline to ingest, analyze
+The goal of this repository is to deploy a minimal pipeline to ingest, analyze
 stream, and automatically insert ads in media contents.
+
+## Architecture
+![architecture diagram](assets/architecture.png)  
+Architecture of the presented solution. It makes use of [Amazon S3](https://aws.amazon.com/s3/) to store the source, the transcoded contents, and the VMAP files. [Lambda Functions](https://aws.amazon.com/lambda/) are used to start a transcoding job and the analysis tasks on [Amazon ECS](https://aws.amazon.com/ecs/). [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) is used to store metadata. [AWS Elemental MediaConvert](https://aws.amazon.com/mediaconvert/) is used to produce HLS playlists while MediaTailor operates the ads insertion based of the generated VMAP file.
 
 
 ## Repository Structure
 ```bash
 .
-├── assets/
-├── cloudformation/
-│ ├── dynamodb.yml
-│ ├── fanout-lambda.yml
-│ ├── inputs.yml
-│ ├── main.yml
-│ ├── media-lambda.yml
-│ ├── tasks.yml
-│ └── vpc.yml
-├── functions/
-│ ├── fanout-lambda/
-│ │ ├── fanout-lambda.py
-│ │ ├── jobTemplate.json
-│ │ └── Makefile
-│ └── media-lambda/
-│     ├── Makefile
-│     └── media-lambda.py
-├── player/
-│ └── index.template.html
-│ └── deploy.sh
-│ └── env.example
-│ └── README.md
-├── tasks/
-│ └── black-frames/
-│     ├── config.env
-│     ├── deploy.env
-│     ├── Dockerfile
-│     ├── Makefile
-│     ├── README.md
-│     ├── task/
-│     │ ├── task.py
-│     │ └── utils.py
-│     └── version.sh
+├── CODE_OF_CONDUCT.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+├── assets
+│   ├── bbb_short.mp4
+│   ├── ffmpeg-blackdetect-sample.txt
+│   └── vmap.xml
+├── cloudformation
+│   ├── dynamodb.yml
+│   ├── fanout-lambda.yml
+│   ├── inputs.yml
+│   ├── main.yml
+│   ├── media-lambda.yml
+│   ├── tasks.yml
+│   └── vpc.yml
+├── functions
+│   ├── fanout-lambda
+│   │   ├── Makefile
+│   │   ├── assets
+│   │   │   └── event.json
+│   │   ├── fanout-lambda.py
+│   │   └── jobTemplate.json
+│   └── media-lambda
+│       ├── Makefile
+│       ├── assets
+│       │   └── event.json
+│       └── media-lambda.py
 ├── install.sh
-└── README.md
+├── player
+│   ├── README.md
+│   ├── deploy.sh
+│   ├── env.example
+│   └── index.template.html
+└── tasks
+    └── black-frames
+        ├── Dockerfile
+        ├── Makefile
+        ├── README.md
+        ├── task
+        │   ├── __init__.py
+        │   ├── pyvenv.cfg
+        │   ├── task.py
+        │   └── utils.py
+        └── version.sh
 
 ```
 
@@ -93,7 +109,7 @@ it's available in the `./assets` folder.
 Big Buck Bunny is a 2008 &copy; copyright of [Blender Foundation](http://www.bigbuckbunny.org/).
 
 ### How does this software make use of FFmpeg?
-FFmpeg is dynamically linked to the software in this repository.  
+Code from FFmpeg is made use of in the software in this repository.  
 The `ffmpeg` cli tool is invoked via a python script to analyse a video file to find black frames.  
 The exact filter used in the analysis is [vf_blackdetect.c](https://github.com/FFmpeg/FFmpeg/blob/release/4.2/libavfilter/vf_blackdetect.c).
 FFmpeg is therfore used to decode the video and run the mentioned filter on the decoded frames.  
@@ -122,7 +138,7 @@ This solution builds a contianer that will be hosted on an ECR repository in you
 The container is built on the top of [giusedroid/ffmpeg-lgpl-ubuntu](https://hub.docker.com/repository/docker/giusedroid/ffmpeg-lgpl).  
 You can inspect the source of said base container [here](https://github.com/giusedroid/ffmpeg-lgpl-ubuntu/blob/master/Dockerfile).  
 The container is run on ECS Fargate and you can inspect the IAM role under which it operates [here](/cloudformation/tasks.yml).  
-ECR scan on push is activate to inspect the container for known vulnerabilities, 
+ECR scan on push is activated to inspect the container for known vulnerabilities, 
 for more information, please read [this article](https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html).
 
 ### About S3 buckets used in this solution

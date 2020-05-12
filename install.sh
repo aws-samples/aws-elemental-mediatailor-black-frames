@@ -107,7 +107,6 @@ IS_CONFIG=$?
 [[ $IS_CONFIG == "1" ]] && touch config.env
 
 echo "building the contianer"
-echo "this will take around 10 mins"
 make dpl="deploy.auto.env" build-nc
 
 echo "testing black frames detection works ok"
@@ -120,6 +119,6 @@ echo "By deploying and using this container, you agree to the terms and conditio
 echo "More information about FFmpeg in README.md"
 read -p "Do you wish to continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
-echo "deploying to ECR $DOCKER_REPO"
+echo "ok, deploying to ECR $DOCKER_REPO"
 make dpl="deploy.auto.env" publish
 cd ../..
