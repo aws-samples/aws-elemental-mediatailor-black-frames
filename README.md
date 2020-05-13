@@ -2,7 +2,7 @@
 
 ![demo gif](assets/demo.gif)
 
-This repository supports the Media Blog article [Monetizing your Media Content with AWS Elemental MediaTailor and Computer Vision](https://aws.amazon.com/blogs/media/monetizing-your-media-content-with-media-tailor).
+This repository supports the Media Blog article [Monetizing your Media Content with AWS Elemental MediaTailor and Computer Vision](https://aws.amazon.com/blogs/media/monetize-media-content-with-aws-elemental-mediatailor-and-computer-vision/).
   
 The goal of this repository is to deploy a minimal pipeline to ingest, analyze
 stream, and automatically insert ads in media contents.
