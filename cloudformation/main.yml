@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: AWS CloudFormation template to create the Ad Break Creation Solution
+Description: (PACE000013/v1/backend) AWS CloudFormation template to create the Ad Break Creation Solution
 Parameters:
   EnvironmentSuffix:
     Type: String
@@ -9,6 +9,11 @@ Parameters:
     Default: abc-solution
   MediaConvertEndpoint:
     Type: String
+    
+Metadata:
+    ID: PACE000013
+    Version: 1
+    Stack: backend
 
 Resources:
 
